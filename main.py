@@ -1,5 +1,10 @@
 
 import pandas as pd
+from scipy.stats import chi2_contingency
+from sklearn.tree import DecisionTreeClassifier # Import Decision Tree Classifier
+from sklearn.model_selection import train_test_split # Import train_test_split function
+from sklearn import metrics #Import scikit-learn metrics module for accuracy calculation
+
 
 # LOAD & PREPROCESSING
 # aggregate mobility data by week
@@ -105,3 +110,36 @@ df = pd.merge(df, census_income, how='left', left_on=['NEIGHBOURHOOD'], right_on
 df = pd.merge(df, census_age, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
 df = pd.merge(df, census_age, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
 
+df.to_csv(r'export.csv')
+
+# Chi Square 
+# print(df.columns.values.tolist())
+contigency_neighbourhood_crime = pd.crosstab(df['NEIGHBOURHOOD'], df['CRIME_INCREASE'], normalize="index") 
+contigency_neighbourhood_type = pd.crosstab(df['NEIGHBOURHOOD'], df['TYPE'], normalize="index")
+contigency_type_crime = pd.crosstab(df['TYPE'], df['CRIME_INCREASE'], normalize="index") 
+# print(contigency_neighbourhood_crime)
+# print(contigency_neighbourhood_type)
+# print(contigency_type_crime)
+
+# contigency_transitlocation_crime = pd.crosstab(df[ ('transit_stations_percent_change_from_baseline', 'mean')], df['CRIME_INCREASE'], normalize="index") 
+
+# Binary Classification Tree
+#split dataset in features and target variable
+feature_cols = ['NEIGHBOURHOOD', 'TYPE']
+X = df[feature_cols] # Features
+y = df['CRIME_INCREASE'] # Target variable
+
+# Split dataset into training set and test set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1) # 70% training and 30% test
+
+# Create Decision Tree classifer object
+clf = DecisionTreeClassifier()
+
+# Train Decision Tree Classifer
+clf = clf.fit(X_train,y_train)
+
+#Predict the response for test dataset
+y_pred = clf.predict(X_test)
+
+# Model Accuracy, how often is the classifier correct?
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
