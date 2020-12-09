@@ -1,4 +1,3 @@
-
 import pandas as pd
 
 # LOAD & PREPROCESSING
@@ -48,13 +47,14 @@ crime['CRIME_INCREASE_PERCENT'] = crime['CRIME_INCREASE_PERCENT']/crime['PRECOVI
 crime['CRIME_INCREASE'] = crime['CRIME_INCREASE_PERCENT'] > 0
 
 
-# transpose census data
+# transpose census data & normalize counts (convert to proportions)
 census_commute = pd.read_csv("data/Processed Data/census-2016-commute-to-work-by-neighbourhood.csv")
 census_commute = census_commute.transpose()
 census_commute.columns = census_commute.iloc[1]
 census_commute = census_commute.drop(census_commute.index[1])
 census_commute = census_commute.drop(census_commute.index[0])
 census_commute = census_commute.reset_index()
+census_commute.iloc[:, 2:] = census_commute.iloc[:, 2:].div(census_commute.iloc[:, 1], axis=0)
 
 census_age = pd.read_csv("data/Processed Data/census-2016-population-by-age-by-neighbourhood.csv")
 census_age = census_age.transpose()
@@ -62,6 +62,9 @@ census_age.columns = census_age.iloc[1]
 census_age = census_age.drop(census_age.index[1])
 census_age = census_age.drop(census_age.index[0])
 census_age = census_age.reset_index()
+census_age.iloc[:, 1] = census_age.iloc[:, 1].str.replace(',', '', regex=False)
+census_age.iloc[:, 1:] = census_age.iloc[:, 1:].astype('int64')
+census_age.iloc[:, 2:] = census_age.iloc[:, 2:].div(census_age.iloc[:, 1], axis=0)
 
 census_household = pd.read_csv("data/Processed Data/census-2016-household-income-by-neighbourhood.csv")
 census_household = census_household.transpose()
@@ -69,6 +72,7 @@ census_household.columns = census_household.iloc[1]
 census_household = census_household.drop(census_household.index[1])
 census_household = census_household.drop(census_household.index[0])
 census_household = census_household.reset_index()
+census_household.iloc[:, 2:] = census_household.iloc[:, 2:].div(census_household.iloc[:, 1], axis=0)
 
 census_income = pd.read_csv("data/Processed Data/census-2016-income-by-neighbourhood.csv")
 census_income = census_income.transpose()
@@ -76,6 +80,7 @@ census_income.columns = census_income.iloc[1]
 census_income = census_income.drop(census_income.index[1])
 census_income = census_income.drop(census_income.index[0])
 census_income = census_income.reset_index()
+census_income.iloc[:, 2:] = census_income.iloc[:, 2:].div(census_income.iloc[:, 1], axis=0)
 
 # clean neighbourhood names
 crime['NEIGHBOURHOOD'] = crime['NEIGHBOURHOOD'].str.strip()
@@ -103,5 +108,14 @@ df = pd.merge(crime, mobility, how='left', left_on=['WEEK'], right_on=['WEEK'])
 df = pd.merge(df, census_commute, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
 df = pd.merge(df, census_income, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
 df = pd.merge(df, census_age, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
-df = pd.merge(df, census_age, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
+df = pd.merge(df, census_household, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
+df = df.dropna()
+df = df.drop(['index_x', 'index_y'], axis=1)
+df.iloc[:, 14:] = df.iloc[:, 14:].astype('float64')
 
+# calculate parameters with greatest correlation to determining crime increase
+correlation = df.corr(method='spearman')
+crime_correlation = correlation['CRIME_INCREASE']
+crime_correlation = crime_correlation.drop(['COVID_COUNT', 'PRECOVID_MEAN_COUNT', 'CRIME_INCREASE_PERCENT', 'CRIME_INCREASE'])
+crime_correlation = crime_correlation.abs()
+crime_correlation = crime_correlation.sort_values(ascending=False)
