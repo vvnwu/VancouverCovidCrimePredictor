@@ -1,6 +1,13 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier # Import Decision Tree Classifier
+from sklearn.model_selection import train_test_split # Import train_test_split function
+from sklearn import metrics #Import scikit-learn metrics module for accuracy calculation
+from sklearn.metrics import confusion_matrix
+from sklearn import tree
 
 # LOAD & PREPROCESSING
+# Some preprocessing was already done on Excel. The remaining pre-processing will be done here.
 # aggregate mobility data by week
 mobility_raw = pd.read_csv("data/Processed Data/vancouver-mobility-data.csv")
 mobility_raw['date'] = pd.to_datetime(mobility_raw['date'])
@@ -113,9 +120,76 @@ df = df.dropna()
 df = df.drop(['index_x', 'index_y'], axis=1)
 df.iloc[:, 14:] = df.iloc[:, 14:].astype('float64')
 
+# Export merged data to csv
+df.to_csv(r'exported/merged_data.csv')
+
 # calculate parameters with greatest correlation to determining crime increase
 correlation = df.corr(method='spearman')
 crime_correlation = correlation['CRIME_INCREASE']
 crime_correlation = crime_correlation.drop(['COVID_COUNT', 'PRECOVID_MEAN_COUNT', 'CRIME_INCREASE_PERCENT', 'CRIME_INCREASE'])
 crime_correlation = crime_correlation.abs()
 crime_correlation = crime_correlation.sort_values(ascending=False)
+
+# the top 5 strongest correlated features are 
+# "Workplace % Change",
+# "Parks % Change",
+# "Transit Stations % Change",
+# "Residential % Change",
+# "Retail/Recreation % Change"
+
+# Binary Classification Tree
+#split dataset in features and target variable
+feature_cols = [
+                    ('workplaces_percent_change_from_baseline', 'mean'),
+                    ('parks_percent_change_from_baseline', 'mean'),
+                    ('transit_stations_percent_change_from_baseline', 'mean'),
+                    ('residential_percent_change_from_baseline', 'mean'),
+                    ('retail_and_recreation_percent_change_from_baseline', 'mean')
+                ]
+X = df[feature_cols] # Features
+y = df['CRIME_INCREASE'] # Target variable
+
+# Split dataset into training set and test set
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3) # 70% training and 30% test
+
+# Create Decision Tree classifer object
+clf = DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+            max_features=None, max_leaf_nodes=None,
+            min_samples_leaf=1,
+            min_samples_split=2, min_weight_fraction_leaf=0.0,
+            presort=False, random_state=None, splitter='best')
+
+# Train Decision Tree Classifer
+clf = clf.fit(X_train,y_train)
+
+#Predict the response for test dataset
+y_pred = clf.predict(X_test)
+
+# Model Accuracy
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+
+print(
+pd.DataFrame(
+    confusion_matrix(y_test, y_pred),
+    columns=['Predicted No Crime Increase', 'Predicted Crime Increase'],
+    index=['True No Crime Increase', 'True Crime Increase']
+)
+)
+
+fn=[
+    "Workplace % Change",
+    "Parks % Change",
+    "Transit Stations % Change",
+    "Residential % Change",
+    "Retail/Recreation % Change"
+    ]
+
+cn=['No Crime Increase', 'Crime Increase']
+fig, axes = plt.subplots(nrows = 1,ncols = 1,figsize = (48, 24), dpi=600)
+
+tree.plot_tree(clf,
+               feature_names = fn, 
+               class_names=cn,
+               max_depth=4,
+               fontsize=16,
+               filled = True);fig.savefig('exported/decision_tree.png')
