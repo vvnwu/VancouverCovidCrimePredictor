@@ -50,8 +50,29 @@ def create_model(df, feature_cols, feature_names, filename):
                 max_depth=4,
                 fontsize=16,
                filled = True);fig.savefig('exported/{}'.format(filename))
+    plt.clf()
 
-def main():
+
+def analyze_df(df, name):
+    print('================= DATASET: ' + name + ' =================')
+    correlation = df.corr(method='spearman')
+    crime_correlation = correlation['CRIME_INCREASE']
+    crime_correlation = crime_correlation.drop(
+        ['COVID_COUNT', 'PRECOVID_MEAN_COUNT', 'CRIME_INCREASE_PERCENT', 'CRIME_INCREASE'])
+    crime_correlation = crime_correlation.abs()
+    crime_correlation = crime_correlation.sort_values(ascending=False)
+
+    feature_cols = crime_correlation.head(7)
+    feature_names = feature_cols.index
+    print(feature_cols)
+
+    print('------------------ TOP 3 ATTR ------------------')
+    create_model(df, feature_names[0:3], feature_names[0:3], name + "_decision_tree_top3_attributes.png")
+    print('------------------ TOP 5 ATTR ------------------')
+    create_model(df, feature_names, feature_names, name + "_decision_tree_top5_attributes.png")
+
+
+def preprocess():
     # LOAD & PREPROCESSING
     # Some preprocessing was already done on Excel. The remaining pre-processing will be done here.
     # aggregate mobility data by week
@@ -59,12 +80,12 @@ def main():
     mobility_raw['date'] = pd.to_datetime(mobility_raw['date'])
     mobility_raw['WEEK'] = mobility_raw['date'].dt.isocalendar().week
     mobility = mobility_raw[['WEEK',
-                            'retail_and_recreation_percent_change_from_baseline',
-                            'grocery_and_pharmacy_percent_change_from_baseline',
-                            'parks_percent_change_from_baseline',
-                            'transit_stations_percent_change_from_baseline',
-                            'workplaces_percent_change_from_baseline',
-                            'residential_percent_change_from_baseline']].groupby(['WEEK']).agg(['mean'])
+                             'retail_and_recreation_percent_change_from_baseline',
+                             'grocery_and_pharmacy_percent_change_from_baseline',
+                             'parks_percent_change_from_baseline',
+                             'transit_stations_percent_change_from_baseline',
+                             'workplaces_percent_change_from_baseline',
+                             'residential_percent_change_from_baseline']].groupby(['WEEK']).agg(['mean'])
 
     # aggregate crime data by week
     crime_raw = pd.read_csv("data/Raw Data/crimedata_csv_all_years.csv")
@@ -74,7 +95,8 @@ def main():
     crime_raw['date'] = crime_raw['YEAR'] + '-' + crime_raw['MONTH'] + '-' + crime_raw['DAY']
     crime_raw['date'] = pd.to_datetime(crime_raw['date'])
 
-    crime_raw = crime_raw[['TYPE', 'NEIGHBOURHOOD', 'date', 'DAY']].groupby(['TYPE','NEIGHBOURHOOD', pd.Grouper(key='date', freq='W-MON')]).count().reset_index()
+    crime_raw = crime_raw[['TYPE', 'NEIGHBOURHOOD', 'date', 'DAY']].groupby(
+        ['TYPE', 'NEIGHBOURHOOD', pd.Grouper(key='date', freq='W-MON')]).count().reset_index()
     crime_raw.columns = ['TYPE', 'NEIGHBOURHOOD', 'DATE', 'COUNT']
 
     # calculate covid crime increase
@@ -86,19 +108,20 @@ def main():
 
     precovid_crime = crime_raw.loc[precovid_mask]
     precovid_crime['WEEK'] = precovid_crime['DATE'].dt.isocalendar().week
-    precovid_crime = precovid_crime[['TYPE', 'NEIGHBOURHOOD', 'WEEK', 'COUNT']].groupby(['TYPE','NEIGHBOURHOOD', 'WEEK']).mean().reset_index()
+    precovid_crime = precovid_crime[['TYPE', 'NEIGHBOURHOOD', 'WEEK', 'COUNT']].groupby(
+        ['TYPE', 'NEIGHBOURHOOD', 'WEEK']).mean().reset_index()
     precovid_crime.columns = ['TYPE', 'NEIGHBOURHOOD', 'WEEK', 'PRECOVID_MEAN_COUNT']
 
     covid_crime = crime_raw.loc[covid_mask]
     covid_crime['WEEK'] = covid_crime['DATE'].dt.isocalendar().week
     covid_crime.columns = ['TYPE', 'NEIGHBOURHOOD', 'DATE', 'COVID_COUNT', 'WEEK']
 
-    crime = pd.merge(covid_crime, precovid_crime, how='left', left_on=['TYPE', 'NEIGHBOURHOOD', 'WEEK'], right_on=['TYPE', 'NEIGHBOURHOOD', 'WEEK'])
+    crime = pd.merge(covid_crime, precovid_crime, how='left', left_on=['TYPE', 'NEIGHBOURHOOD', 'WEEK'],
+                     right_on=['TYPE', 'NEIGHBOURHOOD', 'WEEK'])
     crime = crime.dropna()
     crime['CRIME_INCREASE_PERCENT'] = crime['COVID_COUNT'] - crime['PRECOVID_MEAN_COUNT']
-    crime['CRIME_INCREASE_PERCENT'] = crime['CRIME_INCREASE_PERCENT']/crime['PRECOVID_MEAN_COUNT']
+    crime['CRIME_INCREASE_PERCENT'] = crime['CRIME_INCREASE_PERCENT'] / crime['PRECOVID_MEAN_COUNT']
     crime['CRIME_INCREASE'] = crime['CRIME_INCREASE_PERCENT'] > 0
-
 
     # transpose census data & normalize counts (convert to proportions)
     census_commute = pd.read_csv("data/Processed Data/census-2016-commute-to-work-by-neighbourhood.csv")
@@ -164,46 +187,30 @@ def main():
     df = pd.merge(df, census_household, how='left', left_on=['NEIGHBOURHOOD'], right_on=['index'])
     df = df.dropna()
     df = df.drop(['index_x', 'index_y'], axis=1)
+    df = df.drop(['Total - Main mode of commuting for the employed labour force aged 15 years and over in private households with a usual place of work or no fixed workplace address - 25% sample data',
+                  'Total - Total income groups in 2015 for the population aged 15 years and over in private households - 25% sample data',
+                  '  Without total income',
+                  '  With total income',
+                  ' Total - Age groups and average age of the population - 100% data ',
+                  'Total - Household total income groups in 2015 for private households - 25% sample data',
+                  ], axis=1)
     df.iloc[:, 14:] = df.iloc[:, 14:].astype('float64')
 
     # Export merged data to csv
     df.to_csv(r'exported/merged_data.csv')
+    return df
 
-    # calculate parameters with greatest correlation to determining crime increase
-    correlation = df.corr(method='spearman')
-    crime_correlation = correlation['CRIME_INCREASE']
-    crime_correlation = crime_correlation.drop(['COVID_COUNT', 'PRECOVID_MEAN_COUNT', 'CRIME_INCREASE_PERCENT', 'CRIME_INCREASE'])
-    crime_correlation = crime_correlation.abs()
-    crime_correlation = crime_correlation.sort_values(ascending=False)
 
-    print(crime_correlation.head(7))
+def main():
 
-    # the top 5 strongest correlated features are 
-    # "Workplace % Change",
-    # "Parks % Change",
-    # "Transit Stations % Change",
-    # "Residential % Change",
-    # "Retail/Recreation % Change"
+    df = preprocess()
 
-    # Binary Classification Tree
-    #split dataset in features and target variable
-    feature_cols = [
-                        ('workplaces_percent_change_from_baseline', 'mean'),
-                        ('parks_percent_change_from_baseline', 'mean'),
-                        ('transit_stations_percent_change_from_baseline', 'mean'),
-                        ('residential_percent_change_from_baseline', 'mean'),
-                        ('retail_and_recreation_percent_change_from_baseline', 'mean')
-                    ]
-    feature_names =[
-            "Workplace % Change",
-            "Parks % Change",
-            "Transit Stations % Change",
-            "Residential % Change",
-            "Retail/Recreation % Change"
-            ]
-    filename = "decision_tree.png"
+    analyze_df(df, "All_Crime")
 
-    create_model(df, feature_cols[0:3], feature_names[0:3], "decision_tree_top3_attributes.png")
-    create_model(df, feature_cols, feature_names, "decision_tree_top5_attributes.png")
+    for type in df['TYPE'].unique():
+        type_df = df[df['TYPE'] == type]
+        type = type.replace(" ", "_")
+        type = type.replace("/", "_")
+        analyze_df(type_df, type)
 
 main()
