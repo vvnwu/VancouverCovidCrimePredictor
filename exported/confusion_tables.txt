@@ -1,0 +1,192 @@
+================= DATASET: All_Crime =================
+(workplaces_percent_change_from_baseline, mean)               0.070855
+(parks_percent_change_from_baseline, mean)                    0.062852
+(transit_stations_percent_change_from_baseline, mean)         0.061721
+(residential_percent_change_from_baseline, mean)              0.060801
+(retail_and_recreation_percent_change_from_baseline, mean)    0.060204
+(grocery_and_pharmacy_percent_change_from_baseline, mean)     0.053530
+  $25,000 to $29,999                                          0.051414
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.6932457786116323
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                          713                        30
+True Crime Increase                             297                        26
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.6341463414634146
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                          599                       143
+True Crime Increase                             247                        77
+================= DATASET: Break_and_Enter_Commercial =================
+    15 to 19 years                 0.311637
+    10 to 14 years                 0.302601
+    35 to 39 years                 0.299941
+  15 to 64 years                   0.292956
+    30 to 34 years                 0.287524
+  Car, truck, van - as a driver    0.286803
+    5 to 9 years                   0.279708
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.5925925925925926
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           47                        20
+True Crime Increase                              24                        17
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.6111111111111112
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           51                        12
+True Crime Increase                              30                        15
+================= DATASET: Break_and_Enter_Residential_Other =================
+    $80,000 to $89,999        0.159186
+    $70,000 to $79,999        0.154081
+  $30,000 to $34,999          0.152364
+    $90,000 to $99,999        0.147421
+      $100,000 to $149,999    0.143546
+  $25,000 to $29,999          0.141991
+  Bicycle                     0.134101
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.5535714285714286
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           93                         0
+True Crime Increase                              75                         0
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.6547619047619048
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                          100                        10
+True Crime Increase                              48                        10
+================= DATASET: Mischief =================
+    15 to 19 years                 0.122512
+    10 to 14 years                 0.112901
+    35 to 39 years                 0.108266
+  Car, truck, van - as a driver    0.105929
+    30 to 34 years                 0.100972
+    20 to 24 years                 0.100468
+    $200,000 and over              0.100166
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.5754189944134078
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           93                        18
+True Crime Increase                              58                        10
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.5977653631284916
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           97                        12
+True Crime Increase                              60                        10
+================= DATASET: Other_Theft =================
+  Walked                              0.243017
+    $60,000 to $69,999                0.231455
+    Under $10,000 (including loss)    0.229390
+    $90,000 to $99,999                0.225106
+    15 to 19 years                    0.223299
+    $80,000 to $89,999                0.216744
+    $70,000 to $79,999                0.215195
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.8220338983050848
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           88                         3
+True Crime Increase                              18                         9
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.711864406779661
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           77                         1
+True Crime Increase                              33                         7
+================= DATASET: Theft_from_Vehicle =================
+(workplaces_percent_change_from_baseline, mean)               0.193874
+    20 to 24 years                                            0.192452
+    15 to 19 years                                            0.173269
+(retail_and_recreation_percent_change_from_baseline, mean)    0.168740
+(grocery_and_pharmacy_percent_change_from_baseline, mean)     0.160684
+    10 to 14 years                                            0.154819
+(residential_percent_change_from_baseline, mean)              0.154073
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.6896551724137931
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                          116                        39
+True Crime Increase                              24                        24
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.6995073891625616
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                          117                        27
+True Crime Increase                              34                        25
+================= DATASET: Theft_of_Bicycle =================
+  Public transit          0.195528
+  $70,000 to $79,999      0.187946
+  $90,000 to $99,999      0.187723
+  $80,000 to $89,999      0.179249
+    25 to 29 years        0.177599
+    $50,000 to $59,999    0.167697
+    $60,000 to $69,999    0.154540
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.6198347107438017
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           63                        11
+True Crime Increase                              35                        12
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.6776859504132231
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           69                         8
+True Crime Increase                              31                        13
+================= DATASET: Theft_of_Vehicle =================
+  $10,000 to $14,999               0.158983
+  $100,000 and over                0.157063
+    20 to 24 years                 0.145450
+    10 to 14 years                 0.143915
+  Car, truck, van - as a driver    0.141036
+    15 to 19 years                 0.139692
+  0 to 14 years                    0.137485
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.7613636363636364
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           67                         2
+True Crime Increase                              19                         0
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.7954545454545454
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           70                         0
+True Crime Increase                              18                         0
+================= DATASET: Vehicle_Collision_or_Pedestrian_Struck_(with_Injury) =================
+(residential_percent_change_from_baseline, mean)              0.143705
+    $20,000 to $29,999                                        0.117423
+    $10,000 to $19,999                                        0.115533
+(workplaces_percent_change_from_baseline, mean)               0.106717
+(retail_and_recreation_percent_change_from_baseline, mean)    0.093732
+  $5,000 to $9,999                                            0.093324
+    $100,000 and over                                         0.092970
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.7529411764705882
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           61                         8
+True Crime Increase                              13                         3
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.7058823529411765
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                           56                        13
+True Crime Increase                              12                         4
+
+================= DATASET: All_Crime_6_Layers =================
+(workplaces_percent_change_from_baseline, mean)               0.070855
+(parks_percent_change_from_baseline, mean)                    0.062852
+(transit_stations_percent_change_from_baseline, mean)         0.061721
+(residential_percent_change_from_baseline, mean)              0.060801
+(retail_and_recreation_percent_change_from_baseline, mean)    0.060204
+(grocery_and_pharmacy_percent_change_from_baseline, mean)     0.053530
+  $25,000 to $29,999                                          0.051414
+Name: CRIME_INCREASE, dtype: float64
+------------------ TOP 3 ATTR ------------------
+Accuracy: 0.6913696060037523
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                          709                        38
+True Crime Increase                             291                        28
+------------------ TOP 5 ATTR ------------------
+Accuracy: 0.6416510318949343
+                        Predicted No Crime Increase  Predicted Crime Increase
+True No Crime Increase                          624                       131
+True Crime Increase                             251                        60
+
